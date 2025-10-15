@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mini Bug Tracker</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+<div class="container mt-4">
+  <h2 class="mb-4"><h2>Mini Bug Tracker</h2>
+
+  <!-- Form Tambah Bug -->
+  <div class="card mb-4">
+    <div class="card-header">Add Bug</div>
+    <div class="card-body">
+      <form id="bugForm">
+        <div class="mb-3">
+          <label class="form-label">Title</label>
+          <input type="text" id="title" class="form-control" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Description</label>
+          <textarea id="description" class="form-control" required></textarea>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Severity</label>
+          <select id="severity" class="form-select">
+            <option value="Low">Low</option>
+            <option value="Medium">Medium</option>
+            <option value="High">High</option>
+            <option value="Critical">Critical</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Add Bug</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Daftar Bug -->
+  <div class="card">
+    <div class="card-header">Bug List</div>
+    <div class="card-body">
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Title</th>
+            <th>Severity</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="bugTable"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+  let bugs = JSON.parse(localStorage.getItem("bugs")) || [];
+
+  const form = document.getElementById("bugForm");
+  const table = document.getElementById("bugTable");
+
+  function renderBugs() {
+    table.innerHTML = "";
+    bugs.forEach((bug, index) => {
+      table.innerHTML += `
+        <tr>
+          <td>${index + 1}</td>
+          <td>${bug.title}</td>
+          <td><span class="badge bg-${bug.severity === 'Critical' ? 'danger' : bug.severity === 'High' ? 'warning' : 'secondary'}">${bug.severity}</span></td>
+          <td><span class="badge bg-${bug.status === 'Open' ? 'primary' : bug.status === 'In Progress' ? 'info' : 'success'}">${bug.status}</span></td>
+          <td>
+            <button class="btn btn-sm btn-info" onclick="updateStatus(${index})">Next Status</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteBug(${index})">Delete</button>
+          </td>
+        </tr>
+      `;
+    });
+  }
+
+  function saveBugs() {
+    localStorage.setItem("bugs", JSON.stringify(bugs));
+  }
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const newBug = {
+      title: document.getElementById("title").value,
+      description: document.getElementById("description").value,
+      severity: document.getElementById("severity").value,
+      status: "Open"
+    };
+    bugs.push(newBug);
+    saveBugs();
+    renderBugs();
+    form.reset();
+  });
+
+  function updateStatus(index) {
+    if (bugs[index].status === "Open") bugs[index].status = "In Progress";
+    else if (bugs[index].status === "In Progress") bugs[index].status = "Closed";
+    else bugs[index].status = "Closed";
+    saveBugs();
+    renderBugs();
+  }
+
+  function deleteBug(index) {
+    bugs.splice(index, 1);
+    saveBugs();
+    renderBugs();
+  }
+
+  renderBugs();
+</script>
+
+</body>
+</html>
