@@ -60,6 +60,26 @@
     </div>
   </div>
 
+  <div class="modal fade" id="editModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Description</h5>
+
+        <div class="modal-body">
+          <textarea id="editDescription" class="form-control" rows="5"></textarea>
+        </div>
+
+        <div class="modal-footer">
+          <button id="saveEditBtn" type="button" class="btn btn-primary">Save</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        </div>
+
+      </div>
+      </div>
+    </div>
+  </div>
+
   <div class="card">
     <div class="card-header">Bug List</div>
     <div class="card-body">
@@ -106,7 +126,8 @@
           </td>
           <td>
             <button class="btn btn-sm btn-info" onclick="viewBug(${index})">View</button>
-            <button class="btn btn-sm btn-secondary" onclick="updateStatus(${index})">Next Status</button>
+            <button class="btn btn-sm btn-warning" onclick="editModal(${index})">Edit</button>
+            <button class="btn btn-sm btn-success" onclick="updateStatus(${index})">Next Status</button>
             <button class="btn btn-sm btn-warning" onclick="revertStatus(${index})">Revert Status</button>
             <button class="btn btn-sm btn-danger" onclick="deleteBug(${index})">Delete</button>
           </td>
@@ -172,6 +193,28 @@
     const modal = new bootstrap.Modal(document.getElementById("bugModal"));
     modal.show();
   }
+
+  let editingIndex =null;
+
+  function editModal(index) {
+    editingIndex = index;
+    document.getElementById("editModal").value =bugs[index].description;
+    const modal = new bootstrap.Modal(document.getElementById("editModal"));
+    modal.show();
+  }
+
+  document.getElementById("saveEditBtn").addEventListener("click", () => {
+  if (editingIndex === null) return;
+  bugs[editingIndex].description = document.getElementById("editDescription").value;
+  saveBugs();
+  renderBugs();
+  
+
+  const modalEl = document.getElementById("editModal");
+  const modalInstance = bootstrap.Modal.getInstance(modalEl);
+  modalInstance.hide();
+  editingIndex = null;
+});
 
 
   renderBugs();
